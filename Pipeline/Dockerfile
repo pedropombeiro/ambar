@@ -10,17 +10,13 @@ RUN apt-get update && apt-get install -y \
     libtesseract3 \
     libtesseract-dev \
     tesseract-ocr-eng \
-    tesseract-ocr-rus \
-    tesseract-ocr-ita \
     tesseract-ocr-deu \
     tesseract-ocr-fra \
-    tesseract-ocr-spa \
-    tesseract-ocr-nld \
-    tesseract-ocr-pol \
+    tesseract-ocr-por \
     default-jre \
     default-jdk \
     readpst
-    
+
 # Set timezone
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

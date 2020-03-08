@@ -9,6 +9,7 @@
 Ambar is an open-source document search engine with automated crawling, OCR, tagging and instant full-text search.
 
 Ambar defines a new way to implement full-text document search into your workflow.
+
 - Easily deploy Ambar with a single `docker-compose` file
 - Perform Google-like search through your documents and contents of your images
 - Tag your documents
@@ -17,17 +18,18 @@ Ambar defines a new way to implement full-text document search into your workflo
 ## Features
 
 ### Search
+
 [Tutorial: Mastering Ambar Search Queries](https://ambar.cloud/blog/2017/03/24/mastering-search-queries/)
 
-* Fuzzy Search (John~3)
-* Phrase Search ("John Smith")
-* Search By Author (author:John)
-* Search By File Path (filename:\*.txt)
-* Search By Date (when: yesterday, today, lastweek, etc)
-* Search By Size (size>1M)
-* Search By Tags (tags:ocr)
-* Search As You Type
-* Supported language analyzers: English `ambar_en`, Russian `ambar_ru`, German `ambar_de`, Italian `ambar_it`, Polish `ambar_pl`, Chinese `ambar_cn`, CJK `ambar_cjk`
+- Fuzzy Search (John~3)
+- Phrase Search ("John Smith")
+- Search By Author (author:John)
+- Search By File Path (filename:\*.txt)
+- Search By Date (when: yesterday, today, lastweek, etc)
+- Search By Size (size>1M)
+- Search By Tags (tags:ocr)
+- Search As You Type
+- Supported language analyzers: English `ambar_en`, Russian `ambar_ru`, German `ambar_de`, Italian `ambar_it`, Polish `ambar_pl`, Chinese `ambar_cn`, CJK `ambar_cjk`
 
 ### Crawling
 
@@ -39,17 +41,18 @@ Crawling is automatic, no schedule is needed due to crawlers monitor file system
 **Ambar supports large files (>30MB)**
 
 Supported file types:
-* ZIP archives
-* Mail archives (PST)
-* MS Office documents (Word, Excel, Powerpoint, Visio, Publisher)
-* OCR over images
-* Email messages with attachments
-* Adobe PDF (with OCR)
-* OCR languages: Eng, Rus, Ita, Deu, Fra, Spa, Pl, Nld
-* OpenOffice documents
-* RTF, Plaintext
-* HTML / XHTML
-* Multithread processing
+
+- ZIP archives
+- Mail archives (PST)
+- MS Office documents (Word, Excel, Powerpoint, Visio, Publisher)
+- OCR over images
+- Email messages with attachments
+- Adobe PDF (with OCR)
+- OCR languages: Eng, Deu, Fra, Por
+- OpenOffice documents
+- RTF, Plaintext
+- HTML / XHTML
+- Multithread processing
 
 ## Installation
 
@@ -57,8 +60,8 @@ Supported file types:
 
 You can build Docker images by yourself or buy prebuilt Docker images for **$50** [here](https://ambar.cloud/pricing/).
 
-* Installation instruction for prebuilt images: [here](https://ambar.cloud/docs/installation/)
-* Tutorial on how to build images from scratch see below
+- Installation instruction for prebuilt images: [here](https://ambar.cloud/docs/installation/)
+- Tutorial on how to build images from scratch see below
 
 If you want to see how Ambar works w/o installing it, try our [live demo](https://app.ambar.cloud/). No signup required.
 
@@ -66,31 +69,45 @@ If you want to see how Ambar works w/o installing it, try our [live demo](https:
 
 All the images required to run Ambar can be built locally. In general, each image can be built by navigating into the directory of the component in question, performing the compilation steps required and building the image like that:
 
-```
+```shell
 # From project root
-$ cd FrontEnd
-$ docker build . -t <image_name>
+# Build frontend Node code
+docker run --rm -u "$(id -u):$(id -g)" -e NODE_ENV=production -v "${PWD}/FrontEnd:/usr/src/app" -w /usr/src/app node:8 bash -c "npm install && npm run compile"
+
+# Build Docker images
+docker build ElasticSearch -t "${DOCKER_REPO_ORG}/ambar-es:${DOCKER_TAG}"
+docker build FrontEnd -t "${DOCKER_REPO_ORG}/ambar-frontend:${DOCKER_TAG}"
+docker build LocalCrawler -t "${DOCKER_REPO_ORG}/ambar-local-crawler:${DOCKER_TAG}"
+docker build MongoDB -t "${DOCKER_REPO_ORG}/ambar-mongodb:${DOCKER_TAG}"
+docker build Pipeline -t "${DOCKER_REPO_ORG}/ambar-pipeline:${DOCKER_TAG}"
+docker build Rabbit -t "${DOCKER_REPO_ORG}/ambar-rabbit:${DOCKER_TAG}"
+docker build Redis -t "${DOCKER_REPO_ORG}/ambar-redis:${DOCKER_TAG}"
+docker build ServiceApi -t "${DOCKER_REPO_ORG}/ambar-serviceapi:${DOCKER_TAG}"
+docker build WebApi -t "${DOCKER_REPO_ORG}/ambar-webapi:${DOCKER_TAG}"
+
+# Push Docker images
+docker push "${DOCKER_REPO_ORG}/ambar-es:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-frontend:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-local-crawler:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-mongodb:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-pipeline:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-rabbit:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-redis:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-serviceapi:${DOCKER_TAG}"
+docker push "${DOCKER_REPO_ORG}/ambar-webapi:${DOCKER_TAG}"
 ```
 
 The resulting image can be referred to by the name specified, and run by the containerization tooling of your choice.
 
 In order to use a local Dockerfile with `docker-compose`, simply change the `image` option to `build`, setting the value to the relative path of the directory containing the Dockerfile. Then run `docker-compose build` to build the relevant images. For example:
 
-```
+```yaml
 # docker-compose.yml from project root, referencing local dockerfiles
 pipeline0:
   build: ./Pipeline/
 image: chazu/ambar-pipeline
   localcrawler:
     image: ./LocalCrawler/
-```
-
-Note that some of the components require compilation or other build steps be performed _on the host_ before the docker images can be built. For example, `FrontEnd`:
-
-```
-# Assuming a suitable version of node.js is installed (docker uses 8.10)
-$ npm install
-$ npm run compile
 ```
 
 ## FAQ
@@ -100,7 +117,7 @@ Yes, it's fully open-source.
 ### Is it free?
 Yes, it is forever free and open-source.
 
-### Does it perform OCR? 
+### Does it perform OCR?
 Yes, it performs OCR on images (jpg, tiff, bmp, etc) and PDF's. OCR is perfomed by well-known open-source library Tesseract. We tuned it to achieve best perfomance and quality on scanned documents. You can easily find all files on which OCR was perfomed with `tags:ocr` query
 
 ### Which languages are supported for OCR?
@@ -114,7 +131,7 @@ Yes!
 Yes, it can search through any PDF, even badly encoded or with scans inside. We did our best to make search over any kind of pdf document smooth.
 
 ### What is the maximum file size it can handle?
-It's limited by amount of RAM on your machine, typically it's 500MB. It's an awesome result, as typical document managment systems offer 30MB maximum file size to be processed.  
+It's limited by amount of RAM on your machine, typically it's 500MB. It's an awesome result, as typical document managment systems offer 30MB maximum file size to be processed.
 
 ### I have a problem what should I do?
 Request a dedicated support session by mailing us on hello@ambar.cloud
@@ -131,5 +148,3 @@ Request a dedicated support session by mailing us on hello@ambar.cloud
 
 ## License
 [MIT License](https://github.com/RD17/ambar/blob/master/license.txt)
-
-
