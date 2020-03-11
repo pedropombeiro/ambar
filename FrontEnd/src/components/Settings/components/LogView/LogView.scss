@@ -7,7 +7,7 @@
     padding: 7px;
     height: 230px;
     overflow-y: hidden;
-    overflow-x: hidden;
+    overflow-x: scroll;
     text-overflow: ellipsis;
     white-space: nowrap;
 
@@ -22,11 +22,11 @@
    .blink {
      animation: blinker 0.5s linear infinite;
      color: #7CB342;
-   }    
+   }
 
-   @keyframes :global(blinker) {  
-    50% { opacity: 0; }
-}
+   @keyframes :global(blinker) {
+     50% { opacity: 0; }
+   }
 }
 
 
