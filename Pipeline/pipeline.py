@@ -82,13 +82,17 @@ def ProcessFile(message):
 
         fileId = sha256('{0}{1}'.format(meta['source_id'],meta['full_name']).encode('utf-8')).hexdigest()
 
+        # ignore hidden files
+        if ('/.' in meta['full_name']):
+            event = 'unlink'
+
         if (event == 'unlink'):
             apiResp = apiProxy.HideFile(fileId)
 
             if not apiResp.Success:
                 logger.LogMessage('error', 'error hidding file for {0} {1}'.format(meta['full_name'], apiResp.message))
                 return False
-            
+
             if apiResp.Ok:
                 logger.LogMessage('verbose', 'removed {0}'.format(meta['full_name']))
                 return True
@@ -96,7 +100,7 @@ def ProcessFile(message):
             if not apiResp.NotFound:
                 logger.LogMessage('error', 'error hidding file {0} {1} code: {2}'.format(meta['full_name'], apiResp.message, apiResp.code))
                 return False
-            
+
             return True
 
         if (event != 'add' and event != 'change'):
@@ -126,7 +130,7 @@ def ProcessFile(message):
         if not (apiResp.Ok or apiResp.NotFound):
             logger.LogMessage('error', 'error unhiding file, unexpected response code {0} {1} {2}'.format(meta['full_name'], apiResp.code, apiResp.message))
             return False
-        
+
         fileMeta = AmbarFileMeta.Init(meta)
 
         if not fileMeta.initialized:
