@@ -1,4 +1,4 @@
-FROM node:8.10
+FROM node:8-alpine3.11
 
 # Set a timezone
 ENV TZ=UTC
@@ -10,5 +10,5 @@ RUN yarn run build
 
 CMD node dist
 
-HEALTHCHECK --interval=5s --timeout=30s --retries=50 \
+HEALTHCHECK --interval=15s --timeout=30s --retries=50 \
   CMD curl -f localhost:8081/api || exit 1
