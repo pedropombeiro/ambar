@@ -1,13 +1,12 @@
-FROM node:8.10
+FROM node:8-alpine3.11
 
 # Set a timezone
 ENV TZ=UTC
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 COPY . .
-RUN yarn install
-RUN yarn run build
+RUN yarn install && yarn run build && apk add --no-cache curl
 CMD node dist
 
-HEALTHCHECK --interval=5s --timeout=30s --retries=50 \
+HEALTHCHECK --interval=15s --timeout=30s --retries=50 \
   CMD curl -f localhost:8080/api || exit 1
